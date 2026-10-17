@@ -10,7 +10,7 @@ porcelain.add(str(repo_dir))
 try:
     commit_id = porcelain.commit(
         str(repo_dir),
-        message=b"Add persistent cloud PostgreSQL database support and deployment configurations",
+        message=b"Explicitly configure and lock backend to SQLite database engine",
         author=b"VELO User <user@velo.local>",
         committer=b"VELO User <user@velo.local>"
     )

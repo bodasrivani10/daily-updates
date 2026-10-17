@@ -1,44 +1,59 @@
-# 🚀 VELO: Complete GitHub & Cloud Deployment Guide
+# 🚀 VELO: Step-by-Step GitHub & Cloud Deployment Guide
+**Repository:** `https://github.com/pendeladakshayani-hub/daily-updates.git`
 
-This guide walks you through **pushing VELO to GitHub** and deploying both your **Backend (FastAPI)** and **Frontend (Vite/React)** live on the web for free.
+This guide explains:
+1. How to **push your code to GitHub** in 1 command.
+2. How to deploy the **Backend on Render with persistent database storage** (so user data, projects, and summaries are NEVER lost when the app restarts).
+3. How to deploy the **Frontend on Vercel**.
 
 ---
 
-## 📌 Part 1: Push Project to GitHub
+## 📌 STEP 1: Push Your Code to GitHub
 
-Your project is already initialized with Git and committed with all files, configuration, and your custom **VELO** branding.
+GitHub requires your authentication (Personal Access Token).
 
-### Step 1: Create a New GitHub Repository
-1. Log in to [GitHub](https://github.com/).
-2. In the top-right corner, click **`+`** ➔ **New repository**.
-3. Name your repository (e.g., `velo-workspace`).
-4. Set visibility to **Public** or **Private**.
-5. **Do NOT** check "Add a README file" or ".gitignore" (we already created them).
-6. Click **Create repository**.
-7. Copy your repository HTTPS URL (e.g., `https://github.com/<your-username>/velo-workspace.git`).
+### Quick 2-Minute Token Creation (If you don't have one):
+1. In GitHub, click your profile icon (top right) ➔ **Settings**.
+2. Scroll to the bottom of the left sidebar ➔ **Developer settings**.
+3. Click **Personal access tokens** ➔ **Tokens (classic)** ➔ **Generate new token (classic)**.
+4. Give it a note (e.g. `velo-push`), check the **`repo`** checkbox (Full control of private repositories).
+5. Click **Generate token** and copy the `ghp_...` token.
 
-### Step 2: Push Your Code
-You can push directly using the built-in helper script in your workspace:
+### Push Command:
+Open your Command Prompt or terminal in this folder and run:
 ```powershell
-python push_to_github.py https://github.com/<your-username>/<repo-name>.git <your_github_personal_access_token>
+python push_to_github.py https://github.com/pendeladakshayani-hub/daily-updates.git <YOUR_GITHUB_TOKEN>
 ```
-*(Or if you install Git for Windows, simply run `git remote add origin <url>` and `git push -u origin main`).*
+*Example:*
+```powershell
+python push_to_github.py https://github.com/pendeladakshayani-hub/daily-updates.git ghp_xxxxxxxxxxxxxxxxxxxx
+```
+Your code is now live on GitHub!
 
 ---
 
-## 📌 Part 2: Deploy Backend to Render (Free)
+## 📌 STEP 2: Deploy Backend with Persistent Database on Render
 
-The backend runs FastAPI with SQLite. We deploy it first so we have the live API URL for the frontend.
+To make sure **data is NEVER lost after restart or redeployment**, Render provides a free managed PostgreSQL database.
 
-1. Go to [Render.com](https://render.com/) and sign up / log in with your GitHub account.
-2. On your dashboard, click **New +** ➔ **Web Service**.
-3. Select **Build and deploy from a Git repository** and connect your GitHub repo `velo-workspace`.
-4. Fill in the following settings:
+### A. Create the Free PostgreSQL Database (Takes 1 min)
+1. Go to **[Render.com](https://render.com/)** and log in with GitHub.
+2. Click **New +** ➔ **PostgreSQL**.
+3. Name it: `velo-db`.
+4. Region: Choose the region nearest to you (e.g., *Singapore* or *Oregon*).
+5. Plan: **Free**.
+6. Click **Create Database**.
+7. Once created, find the field **Internal Database URL** (or **External Database URL**) and click **Copy**.
+   *(It looks like: `postgresql://velo_db_user:...@dpg-...-a.render.com/velo_db`)*
+
+### B. Deploy the Backend Web Service
+1. On Render dashboard, click **New +** ➔ **Web Service**.
+2. Connect your repository: `pendeladakshayani-hub/daily-updates`.
+3. Set the following options:
    - **Name**: `velo-api`
-   - **Region**: Closest to you (e.g., *Singapore* or *Oregon*)
-   - **Language / Runtime**: `Python 3`
+   - **Language**: `Python 3`
    - **Branch**: `main`
-   - **Root Directory**: *(leave blank or set to `.`)*
+   - **Root Directory**: *(leave empty)*
    - **Build Command**: 
      ```bash
      pip install -r requirements.txt
@@ -48,36 +63,30 @@ The backend runs FastAPI with SQLite. We deploy it first so we have the live API
      uvicorn backend.main:app --host 0.0.0.0 --port $PORT
      ```
    - **Instance Type**: **Free**
+4. Scroll down to **Environment Variables** ➔ click **Add Environment Variable**:
+   - **Key**: `DATABASE_URL`
+   - **Value**: *(Paste the PostgreSQL URL you copied in Step A)*
 5. Click **Create Web Service**.
-6. Render will install dependencies and start your backend. Once deployed, Render will provide your public URL:
-   > Example: `https://velo-api-xxxx.onrender.com`
-7. Test it by opening `https://velo-api-xxxx.onrender.com/docs` to see the interactive Swagger API documentation.
+
+🎉 **Your Backend is live!** Render will give you an API URL:
+> Example: `https://velo-api-xxxx.onrender.com`
+*(All registered users, tasks, summaries, and updates will be permanently preserved in PostgreSQL!)*
 
 ---
 
-## 📌 Part 3: Deploy Frontend to Vercel (Free)
+## 📌 STEP 3: Deploy Frontend to Vercel (Free)
 
-1. Go to [Vercel.com](https://vercel.com/) and log in with your GitHub account.
+1. Go to **[Vercel.com](https://vercel.com/)** and log in with GitHub.
 2. Click **Add New...** ➔ **Project**.
-3. Import your `velo-workspace` repository.
-4. In the configuration screen:
+3. Import `daily-updates`.
+4. Configure Project settings:
    - **Framework Preset**: `Vite`
-   - **Root Directory**: Click *Edit* and select **`frontend`**
+   - **Root Directory**: Click *Edit* and choose **`frontend`**
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
-5. Expand **Environment Variables** and add:
+5. Expand **Environment Variables**:
    - **Key**: `VITE_API_URL`
-   - **Value**: `https://velo-api-xxxx.onrender.com/api` *(replace with your Render URL from Part 2)*
+   - **Value**: `https://velo-api-xxxx.onrender.com/api` *(Your Render backend URL followed by `/api`)*
 6. Click **Deploy**.
-7. In ~60 seconds, your site is live! You will receive a URL like:
-   > `https://velo-workspace.vercel.app`
 
----
-
-## 🎯 Verification Checklist
-
-- [x] **Branding**: Displays the custom VELO logo.
-- [x] **Registration**: `+ Register Your Details` adds new members instantly.
-- [x] **Manager Dashboard**: Search bar active, review summaries, mark task complete.
-- [x] **Employee Dashboard**: Direct summary input without file uploads + channel selector.
-- [x] **Cloud-ready**: `vercel.json` SPA routing configured & root `Procfile` ready.
+🚀 In ~1 minute, your website is online with your custom VELO branding, full employee and manager dashboards, and persistent storage!
