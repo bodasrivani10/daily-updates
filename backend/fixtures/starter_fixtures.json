@@ -1,0 +1,110 @@
+[
+  {
+    "source_id": "msg-1042",
+    "timestamp": "2026-10-17T09:00:00+05:30",
+    "author": "Asha",
+    "work_item_id": "TASK-204",
+    "text": "API integration is complete.",
+    "visibility": "team",
+    "source_system": "slack"
+  },
+  {
+    "source_id": "msg-1043",
+    "timestamp": "2026-10-17T10:00:00+05:30",
+    "author": "Marcus",
+    "work_item_id": "TASK-204",
+    "text": "Integration tests are failing; release is blocked.",
+    "visibility": "team",
+    "source_system": "slack"
+  },
+  {
+    "source_id": "msg-1044",
+    "timestamp": "2026-10-17T10:30:00+05:30",
+    "author": "Asha",
+    "work_item_id": "TASK-204",
+    "text": "API work is complete, but release remains blocked by tests.",
+    "visibility": "team",
+    "source_system": "slack"
+  },
+  {
+    "source_id": "msg-1045",
+    "timestamp": "2026-10-17T09:15:00+05:30",
+    "author": "Elena",
+    "work_item_id": "AUTH-101",
+    "text": "OAuth2 scope expansion submitted; waiting for SecOps security review approval before merge.",
+    "visibility": "team",
+    "source_system": "github"
+  },
+  {
+    "source_id": "msg-1046",
+    "timestamp": "2026-10-17T09:45:00+05:30",
+    "author": "Priya",
+    "work_item_id": "PAY-305",
+    "text": "Taking full ownership of payment gateway migration. Core endpoints scaffolded.",
+    "visibility": "team",
+    "source_system": "slack"
+  },
+  {
+    "source_id": "msg-1047",
+    "timestamp": "2026-10-17T10:15:00+05:30",
+    "author": "Carlos",
+    "work_item_id": "PAY-305",
+    "text": "Migrating payment gateway v2 as sole tech lead. Please direct all PR reviews to me.",
+    "visibility": "team",
+    "source_system": "slack"
+  },
+  {
+    "source_id": "msg-1048",
+    "timestamp": "2026-10-17T08:30:00+05:30",
+    "author": "Devin",
+    "work_item_id": "DATA-402",
+    "text": "ETL latency increased 4x after midnight batch; downstream analytics DASH-701 dashboard data is stale.",
+    "visibility": "team",
+    "source_system": "jira"
+  },
+  {
+    "source_id": "msg-1049",
+    "timestamp": "2026-10-17T11:00:00+05:30",
+    "author": "Sam",
+    "work_item_id": "INFRA-550",
+    "text": "PR #82 merged; deployment pending staging verification.",
+    "visibility": "team",
+    "source_system": "github"
+  },
+  {
+    "source_id": "msg-1049",
+    "timestamp": "2026-10-17T11:00:00+05:30",
+    "author": "Sam",
+    "work_item_id": "INFRA-550",
+    "text": "PR #82 merged; deployment pending staging verification.",
+    "visibility": "team",
+    "source_system": "github"
+  },
+  {
+    "source_id": "msg-1050",
+    "timestamp": "2026-10-17T11:05:00+05:30",
+    "author": "Sam (Bot)",
+    "work_item_id": "INFRA-550",
+    "text": "PR #82 merged; deployment pending staging verification. (slack cross-post)",
+    "visibility": "team",
+    "source_system": "slack"
+  },
+  {
+    "source_id": "msg-1051",
+    "timestamp": "2026-10-17T11:20:00+05:30",
+    "author": "Liam",
+    "work_item_id": "UI-602",
+    "text": "Redesigned landing page hero section and updated typography tokens.",
+    "visibility": "team",
+    "source_system": "jira"
+  },
+  {
+    "source_id": "msg-1052",
+    "timestamp": "2026-10-17T11:45:00+05:30",
+    "author": "Zoe",
+    "work_item_id": "SEC-900",
+    "text": "Executive quarterly security audit keys rotated in vault. Restricted access only.",
+    "visibility": "restricted",
+    "source_system": "manual"
+  }
+]

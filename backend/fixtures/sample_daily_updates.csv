@@ -1,0 +1,13 @@
+source_id,timestamp,author,work_item_id,text,visibility,source_system
+msg-1042,2026-10-17T09:00:00+05:30,Asha,TASK-204,API integration is complete.,team,slack
+msg-1043,2026-10-17T10:00:00+05:30,Marcus,TASK-204,Integration tests are failing; release is blocked.,team,slack
+msg-1044,2026-10-17T10:30:00+05:30,Asha,TASK-204,API work is complete, but release remains blocked by tests.,team,slack
+msg-1045,2026-10-17T09:15:00+05:30,Elena,AUTH-101,OAuth2 scope expansion submitted; waiting for SecOps security review approval before merge.,team,github
+msg-1046,2026-10-17T09:45:00+05:30,Priya,PAY-305,Taking full ownership of payment gateway migration. Core endpoints scaffolded.,team,slack
+msg-1047,2026-10-17T10:15:00+05:30,Carlos,PAY-305,Migrating payment gateway v2 as sole tech lead. Please direct all PR reviews to me.,team,slack
+msg-1048,2026-10-17T08:30:00+05:30,Devin,DATA-402,ETL latency increased 4x after midnight batch; downstream analytics DASH-701 dashboard data is stale.,team,jira
+msg-1049,2026-10-17T11:00:00+05:30,Sam,INFRA-550,PR #82 merged; deployment pending staging verification.,team,github
+msg-1049,2026-10-17T11:00:00+05:30,Sam,INFRA-550,PR #82 merged; deployment pending staging verification.,team,github
+msg-1050,2026-10-17T11:05:00+05:30,Sam (Bot),INFRA-550,PR #82 merged; deployment pending staging verification. (slack cross-post),team,slack
+msg-1051,2026-10-17T11:20:00+05:30,Liam,UI-602,Redesigned landing page hero section and updated typography tokens.,team,jira
+msg-1052,2026-10-17T11:45:00+05:30,Zoe,SEC-900,Executive quarterly security audit keys rotated in vault. Restricted access only.,restricted,manual
