@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .models.base import Base, engine, SessionLocal
+from .models import db_models
 from .api import imports, work_items, conflicts, blockers, digests, evaluation, projects_teams, slack, email_integration
 from .services.seed_data import seed_initial_users_and_projects
 
@@ -9,8 +10,11 @@ from .services.seed_data import seed_initial_users_and_projects
 Base.metadata.create_all(bind=engine)
 
 # Auto seed default users, managers, and projects if empty
-with SessionLocal() as db_session:
-    seed_initial_users_and_projects(db_session)
+try:
+    with SessionLocal() as db_session:
+        seed_initial_users_and_projects(db_session)
+except Exception as e:
+    print(f"Warning: Database auto-seed encountered: {e}")
 
 app = FastAPI(
     title="DailySignal AI API",
