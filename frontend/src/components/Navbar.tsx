@@ -28,6 +28,8 @@ interface NavbarProps {
   currentUser: UserProfile | null;
   onLogout: () => void;
   onOpenAIAgent: (prompt: string) => void;
+  onOpenSlack?: () => void;
+  onOpenEmail?: (provider: 'outlook' | 'gmail') => void;
   onRefreshData?: () => void;
 }
 
@@ -39,6 +41,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentUser,
   onLogout,
   onOpenAIAgent,
+  onOpenSlack,
+  onOpenEmail,
   onRefreshData,
 }) => {
   const [loadingStarter, setLoadingStarter] = useState(false);
@@ -147,6 +151,40 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right Controls: AI Agent Copilot Button, User Badge & Logout */}
           <div className="flex items-center gap-2.5">
+            {/* Slack Integration Button */}
+            <button
+              onClick={() => onOpenSlack ? onOpenSlack() : null}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold bg-[#4A154B] hover:bg-[#611f69] border border-purple-400/30 text-white rounded-lg transition-all shadow-md shadow-purple-900/30 active:scale-95"
+              title="Connect & Ingest Slack Channel Updates"
+            >
+              <img
+                src="https://a.slack-edge.com/80588/marketing/img/meta/slack_hash_256.png"
+                alt="Slack"
+                className="w-3.5 h-3.5 object-contain"
+              />
+              <span className="hidden xl:inline">Slack</span>
+            </button>
+
+            {/* Outlook Integration Button */}
+            <button
+              onClick={() => onOpenEmail ? onOpenEmail('outlook') : null}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold bg-[#0078D4] hover:bg-[#006abc] border border-sky-400/30 text-white rounded-lg transition-all shadow-md shadow-sky-900/30 active:scale-95"
+              title="Connect & Ingest Microsoft Outlook Mail"
+            >
+              <span className="text-sm">📧</span>
+              <span className="hidden xl:inline">Outlook</span>
+            </button>
+
+            {/* Gmail Integration Button */}
+            <button
+              onClick={() => onOpenEmail ? onOpenEmail('gmail') : null}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold bg-[#EA4335] hover:bg-[#d93829] border border-rose-400/30 text-white rounded-lg transition-all shadow-md shadow-rose-900/30 active:scale-95"
+              title="Connect & Ingest Google Gmail"
+            >
+              <span className="text-sm">✉️</span>
+              <span className="hidden xl:inline">Gmail</span>
+            </button>
+
             {/* AI Copilot Trigger */}
             <button
               onClick={() => onOpenAIAgent('Summarize current team progress and highlight blockers')}

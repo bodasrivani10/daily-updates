@@ -32,9 +32,9 @@ Your code is now live on GitHub!
 
 ---
 
-## 📌 STEP 2: Deploy Backend with Persistent Database on Render
+## 📌 STEP 2: Deploy Backend with SQLite Database on Render
 
-To make sure **data is NEVER lost after restart or redeployment**, Render provides a free managed PostgreSQL database.
+The backend is configured to use **SQLite** (`dailysignal.db`). No extra database setup is required.
 
 ### A. Create the Free PostgreSQL Database (Takes 1 min)
 1. Go to **[Render.com](https://render.com/)** and log in with GitHub.

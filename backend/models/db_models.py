@@ -306,3 +306,55 @@ class DigestClaim(Base):
     verification_status = Column(String(50), default="verified")  # verified, flagged_unsupported, needs_review
 
     digest = relationship("Digest", back_populates="claims")
+
+
+class SlackWorkspaceIntegration(Base):
+    __tablename__ = "slack_integrations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
+    team_id = Column(String(100), nullable=False)  # Slack Workspace Team ID e.g. T0123456
+    team_name = Column(String(200), nullable=True)
+    bot_access_token = Column(String(255), nullable=False)
+    bot_user_id = Column(String(100), nullable=True)
+    scope = Column(Text, nullable=True)
+    incoming_webhook_url = Column(Text, nullable=True)
+    incoming_webhook_channel = Column(String(100), nullable=True)
+    selected_channel_id = Column(String(100), nullable=True)
+    selected_channel_name = Column(String(100), nullable=True)
+    authed_user_id = Column(String(100), nullable=True)
+    authed_user_token = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+
+class OutlookIntegration(Base):
+    __tablename__ = "outlook_integrations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
+    email_address = Column(String(200), nullable=False)
+    account_name = Column(String(200), nullable=True)
+    access_token = Column(Text, nullable=False)
+    refresh_token = Column(Text, nullable=True)
+    tenant_id = Column(String(100), default="common")
+    selected_folder = Column(String(100), default="Inbox")
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+
+class GmailIntegration(Base):
+    __tablename__ = "gmail_integrations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
+    email_address = Column(String(200), nullable=False)
+    account_name = Column(String(200), nullable=True)
+    access_token = Column(Text, nullable=False)
+    refresh_token = Column(Text, nullable=True)
+    selected_label = Column(String(100), default="INBOX")
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))

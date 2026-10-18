@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .models.base import Base, engine, SessionLocal
-from .api import imports, work_items, conflicts, blockers, digests, evaluation, projects_teams
+from .api import imports, work_items, conflicts, blockers, digests, evaluation, projects_teams, slack, email_integration
 from .services.seed_data import seed_initial_users_and_projects
 
 # Initialize DB tables
@@ -35,6 +35,8 @@ app.include_router(conflicts.router)
 app.include_router(blockers.router)
 app.include_router(digests.router)
 app.include_router(evaluation.router)
+app.include_router(slack.router)
+app.include_router(email_integration.router)
 
 
 @app.get("/")

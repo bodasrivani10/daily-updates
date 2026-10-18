@@ -448,4 +448,149 @@ export const api = {
     if (!res.ok) throw new Error(await res.text());
     return res.json();
   },
+
+  // Slack Integration API
+  async getSlackConfig(): Promise<{
+    client_id_configured: boolean;
+    client_id: string;
+    is_connected: boolean;
+    team_name?: string;
+    team_id?: string;
+    selected_channel_name?: string;
+    selected_channel_id?: string;
+    has_token: boolean;
+  }> {
+    const res = await fetch(`${BASE_URL}/slack/config`, {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+
+  getSlackAuthUrl(clientId?: string): string {
+    const params = new URLSearchParams();
+    if (clientId) params.append('client_id', clientId);
+    return `${BASE_URL}/slack/oauth/authorize?${params.toString()}`;
+  },
+
+  async connectSlackToken(botToken: string, defaultChannel?: string): Promise<any> {
+    const res = await fetch(`${BASE_URL}/slack/manual-connect`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ bot_token: botToken, default_channel: defaultChannel }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+
+  async getSlackChannels(): Promise<{ channels: Array<{ id: string; name: string }>; connected: boolean }> {
+    const res = await fetch(`${BASE_URL}/slack/channels`, {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+
+  async syncSlackMessages(channelId?: string): Promise<any> {
+    const res = await fetch(`${BASE_URL}/slack/sync-messages`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ channel_id: channelId }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+
+  async disconnectSlack(): Promise<any> {
+    const res = await fetch(`${BASE_URL}/slack/disconnect`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+
+  // Email (Outlook & Gmail) Integration API
+  async getEmailConfig(): Promise<{
+    outlook: {
+      client_id_configured: boolean;
+      client_id: string;
+      is_connected: boolean;
+      email_address?: string;
+      account_name?: string;
+      selected_folder: string;
+    };
+    gmail: {
+      client_id_configured: boolean;
+      client_id: string;
+      is_connected: boolean;
+      email_address?: string;
+      account_name?: string;
+      selected_label: string;
+    };
+  }> {
+    const res = await fetch(`${BASE_URL}/email/config`, {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+
+  getOutlookAuthUrl(clientId?: string): string {
+    const params = new URLSearchParams();
+    if (clientId) params.append('client_id', clientId);
+    return `${BASE_URL}/email/outlook/oauth/authorize?${params.toString()}`;
+  },
+
+  getGmailAuthUrl(clientId?: string): string {
+    const params = new URLSearchParams();
+    if (clientId) params.append('client_id', clientId);
+    return `${BASE_URL}/email/gmail/oauth/authorize?${params.toString()}`;
+  },
+
+  async connectEmailManual(data: {
+    service: 'outlook' | 'gmail';
+    email: string;
+    access_token: string;
+    folder?: string;
+  }): Promise<any> {
+    const res = await fetch(`${BASE_URL}/email/connect-manual`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+
+  async syncEmailMessages(service: 'outlook' | 'gmail'): Promise<any> {
+    const res = await fetch(`${BASE_URL}/email/sync-messages`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ service }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+
+  async disconnectEmail(service: 'outlook' | 'gmail'): Promise<any> {
+    const res = await fetch(`${BASE_URL}/email/disconnect?service=${service}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
 };

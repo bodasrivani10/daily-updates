@@ -22,6 +22,8 @@ interface EmployeeDashboardProps {
   onOpenCitation: (sourceId: string) => void;
   refreshTrigger: number;
   onOpenAIAgent?: (prompt: string) => void;
+  onOpenSlack?: () => void;
+  onOpenEmail?: (provider: 'outlook' | 'gmail') => void;
 }
 
 export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
@@ -29,6 +31,8 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
   onOpenCitation,
   refreshTrigger,
   onOpenAIAgent,
+  onOpenSlack,
+  onOpenEmail,
 }) => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [workItems, setWorkItems] = useState<WorkItemSummary[]>([]);
@@ -175,21 +179,33 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
             </div>
           </div>
 
-          {/* Sync integrations badges */}
-          <div className="hidden sm:flex items-center gap-2 text-xs">
-            <span className="text-slate-400 font-medium">Channel Sync:</span>
-            <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-semibold border border-purple-200 text-[11px] flex items-center gap-1">
-              💬 Slack
-            </span>
-            <span className="px-2 py-0.5 rounded bg-sky-50 text-sky-700 font-semibold border border-sky-200 text-[11px] flex items-center gap-1">
-              📧 Outlook
-            </span>
-            <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold border border-blue-200 text-[11px] flex items-center gap-1">
-              👥 MS Teams
-            </span>
-            <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-700 font-semibold border border-rose-200 text-[11px] flex items-center gap-1">
-              ✉️ Gmail
-            </span>
+            {/* Sync integrations badges */}
+            <div className="hidden sm:flex items-center gap-2 text-xs">
+              <span className="text-slate-400 font-medium">Channel Sync:</span>
+              <button
+                type="button"
+                onClick={() => onOpenSlack ? onOpenSlack() : null}
+                className="px-2 py-0.5 rounded bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold border border-purple-200 text-[11px] flex items-center gap-1 transition cursor-pointer"
+                title="Connect or Sync Slack"
+              >
+                💬 Slack
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenEmail ? onOpenEmail('outlook') : null}
+                className="px-2 py-0.5 rounded bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold border border-sky-200 text-[11px] flex items-center gap-1 transition cursor-pointer"
+                title="Connect or Sync Outlook"
+              >
+                📧 Outlook
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenEmail ? onOpenEmail('gmail') : null}
+                className="px-2 py-0.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold border border-rose-200 text-[11px] flex items-center gap-1 transition cursor-pointer"
+                title="Connect or Sync Gmail"
+              >
+                ✉️ Gmail
+              </button>
           </div>
         </div>
 
@@ -228,7 +244,6 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
               >
                 <option value="slack">💬 Slack (#daily-standup & #project-sync)</option>
                 <option value="outlook">📧 Microsoft Outlook (Connected Mailbox)</option>
-                <option value="teams">👥 Microsoft Teams (Channel Standup Thread)</option>
                 <option value="gmail">✉️ Google Gmail (Work Account Inbox)</option>
                 <option value="jira">🎯 Atlassian Jira (Sprint Task Sync)</option>
                 <option value="manual_summary">⚡ Direct VELO Portal Ingestion</option>

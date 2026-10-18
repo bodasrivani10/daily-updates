@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
 import { CitationModal } from './components/CitationModal';
 import { AIAgentCopilotModal } from './components/AIAgentCopilotModal';
+import { SlackIntegrationModal } from './components/SlackIntegrationModal';
+import { EmailIntegrationModal } from './components/EmailIntegrationModal';
 import { LoginPage } from './pages/LoginPage';
 import { EmployeeDashboard } from './pages/EmployeeDashboard';
 import { ManagerDashboard } from './pages/ManagerDashboard';
@@ -24,6 +26,13 @@ export function App() {
   const [selectedWorkItemId, setSelectedWorkItemId] = useState<string | null>(null);
   const [citationSourceId, setCitationSourceId] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(Date.now());
+
+  // Slack Integration Modal state
+  const [showSlackModal, setShowSlackModal] = useState<boolean>(false);
+
+  // Email (Outlook & Gmail) Modal state
+  const [showEmailModal, setShowEmailModal] = useState<boolean>(false);
+  const [emailProvider, setEmailProvider] = useState<'outlook' | 'gmail'>('outlook');
 
   // AI Agent Copilot state
   const [showAIAgent, setShowAIAgent] = useState<boolean>(false);
@@ -105,8 +114,8 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col text-slate-900">
-      {/* Top Navigation Bar */}
-      <Navbar
+      {/* Side Navigation Bar */}
+      <Sidebar
         activeTab={activeTab}
         setActiveTab={(tab) => {
           setActiveTab(tab);
@@ -117,20 +126,31 @@ export function App() {
         currentUser={currentUser}
         onLogout={handleLogout}
         onOpenAIAgent={handleOpenAIAgent}
+        onOpenSlack={() => setShowSlackModal(true)}
+        onOpenEmail={(prov) => {
+          setEmailProvider(prov);
+          setShowEmailModal(true);
+        }}
         onRefreshData={triggerRefresh}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Dashboard 1: Employee Dashboard */}
-        {activeTab === 'dashboard-employee' && (
-          <EmployeeDashboard
-            onNavigate={handleNavigate}
-            onOpenCitation={(sid) => setCitationSourceId(sid)}
-            refreshTrigger={refreshTrigger}
-            onOpenAIAgent={handleOpenAIAgent}
-          />
-        )}
+      {/* Main Content Area (offset by left sidebar width on desktop) */}
+      <div className="lg:pl-64 flex-1 flex flex-col min-w-0 transition-all duration-300">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* Dashboard 1: Employee Dashboard */}
+          {activeTab === 'dashboard-employee' && (
+            <EmployeeDashboard
+              onNavigate={handleNavigate}
+              onOpenCitation={(sid) => setCitationSourceId(sid)}
+              refreshTrigger={refreshTrigger}
+              onOpenAIAgent={handleOpenAIAgent}
+              onOpenSlack={() => setShowSlackModal(true)}
+              onOpenEmail={(prov) => {
+                setEmailProvider(prov);
+                setShowEmailModal(true);
+              }}
+            />
+          )}
 
         {/* Dashboard 2: Manager / Team Lead Dashboard */}
         {activeTab === 'dashboard-manager' && (
@@ -208,23 +228,39 @@ export function App() {
         initialQuery={aiAgentPrompt}
       />
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-slate-900 tracking-tight">VELO</span>
-            <span>•</span>
-            <span>AI Workspace & Team Intelligence</span>
+      {/* Slack API Workspace Modal */}
+      <SlackIntegrationModal
+        isOpen={showSlackModal}
+        onClose={() => setShowSlackModal(false)}
+        onSyncComplete={() => triggerRefresh()}
+      />
+
+      {/* Email (Outlook & Gmail) Integration Modal */}
+      <EmailIntegrationModal
+        isOpen={showEmailModal}
+        initialProvider={emailProvider}
+        onClose={() => setShowEmailModal(false)}
+        onSyncComplete={() => triggerRefresh()}
+      />
+
+        {/* Footer */}
+        <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-slate-900 tracking-tight">VELO</span>
+              <span>•</span>
+              <span>AI Workspace & Team Intelligence</span>
+            </div>
+            <div className="flex items-center gap-4 text-slate-400">
+              <span>Slack / Outlook / Gmail Linked</span>
+              <span>•</span>
+              <span>SQLite Robust Storage</span>
+              <span>•</span>
+              <span>AI Copilot Triage</span>
+            </div>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span>Slack / Outlook / Teams / Gmail Linked</span>
-            <span>•</span>
-            <span>SQLite Robust Storage</span>
-            <span>•</span>
-            <span>AI Copilot Triage</span>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 }
