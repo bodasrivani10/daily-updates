@@ -11,7 +11,10 @@ import {
   Send,
   Layers,
   Search,
-  Filter
+  Filter,
+  Sparkles,
+  RefreshCw,
+  FileText
 } from 'lucide-react';
 import { api } from '../services/api';
 import {
@@ -76,6 +79,41 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Live Slack Ingestion & Summarizer State
+  const [latestDigest, setLatestDigest] = useState<any | null>(null);
+  const [syncingSlack, setSyncingSlack] = useState(false);
+  const [digestLoading, setDigestLoading] = useState(false);
+
+  const fetchLatestDigest = async () => {
+    try {
+      setDigestLoading(true);
+      const digests = await api.getDigests();
+      if (digests && digests.length > 0) {
+        const detail = await api.getDigestDetail(digests[0].id);
+        setLatestDigest(detail);
+      }
+    } catch (e) {
+      console.error('Failed to load digest:', e);
+    } finally {
+      setDigestLoading(false);
+    }
+  };
+
+  const handleSyncSlackAndSummarize = async () => {
+    try {
+      setSyncingSlack(true);
+      showToast('Syncing Slack updates & running backend validation & deduplication...');
+      const res = await api.syncSlackMessages();
+      showToast(res.message || 'Slack updates validated, deduplicated & summary generated!');
+      await fetchLatestDigest();
+      loadData();
+    } catch (err: any) {
+      alert(`Slack sync error: ${err.message}`);
+    } finally {
+      setSyncingSlack(false);
+    }
+  };
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -104,6 +142,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 
   useEffect(() => {
     loadData();
+    fetchLatestDigest();
   }, [refreshTrigger]);
 
   const showToast = (msg: string) => {
@@ -302,6 +341,115 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
           <button onClick={() => setToastMessage(null)} className="text-blue-600 hover:underline">Dismiss</button>
         </div>
       )}
+
+      {/* AI Slack Updates Summarizer & Pipeline Card */}
+      <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white border border-indigo-800/60 shadow-xl space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg border border-indigo-400/30">
+                <Sparkles className="w-5 h-5" />
+              </span>
+              <h3 className="text-base font-bold text-white">
+                Live Slack Standup Summarizer & Evidence Pipeline
+              </h3>
+            </div>
+            <p className="text-xs text-indigo-200/80 max-w-2xl">
+              Pulls employee daily updates from Slack channels, executes <strong>Stage 2 Validation</strong> &amp; <strong>Stage 3 Deduplication</strong> in the backend, and synthesizes a citation-backed manager digest.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleSyncSlackAndSummarize}
+              disabled={syncingSlack}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-lg transition"
+            >
+              <RefreshCw className={`w-4 h-4 ${syncingSlack ? 'animate-spin' : ''}`} />
+              {syncingSlack ? 'Validating & Deduplicating...' : 'Sync Slack & Generate Summary'}
+            </button>
+            <button
+              onClick={() => onNavigate('digest')}
+              className="inline-flex items-center gap-1.5 px-3 py-2.5 bg-indigo-900/80 hover:bg-indigo-800 text-indigo-200 text-xs font-semibold rounded-xl border border-indigo-700/60 transition"
+            >
+              <FileText className="w-4 h-4" />
+              Full Digest View
+            </button>
+          </div>
+        </div>
+
+        {/* Live Summary Preview Box */}
+        {digestLoading ? (
+          <div className="p-4 bg-slate-950/60 rounded-xl border border-slate-800 text-xs text-slate-400 animate-pulse">
+            Loading latest validated summary digest...
+          </div>
+        ) : latestDigest ? (
+          <div className="bg-slate-950/70 p-4 rounded-xl border border-indigo-900/40 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  Evidence Verified
+                </span>
+                <span className="text-xs text-slate-400 font-mono">
+                  {latestDigest.digest_date}
+                </span>
+              </div>
+              <span className="text-xs text-indigo-300">
+                {latestDigest.claims?.length || 0} Verified Claims • {latestDigest.total_updates_analyzed || 0} Updates Analyzed
+              </span>
+            </div>
+
+            <h4 className="text-sm font-semibold text-white leading-snug">
+              {latestDigest.summary_headline || 'Team Execution Summary across Slack & Workspace channels.'}
+            </h4>
+
+            {latestDigest.claims && latestDigest.claims.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-2">
+                {latestDigest.claims.slice(0, 4).map((claim: any) => (
+                  <div
+                    key={claim.id}
+                    className="p-2.5 bg-slate-900/80 rounded-lg border border-slate-800 text-xs space-y-1.5 hover:border-indigo-500/50 transition cursor-pointer"
+                    onClick={() => {
+                      if (claim.supporting_source_ids && claim.supporting_source_ids.length > 0) {
+                        onOpenCitation(claim.supporting_source_ids[0]);
+                      }
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-indigo-400 uppercase">
+                        {claim.section || 'Progress'}
+                      </span>
+                      {claim.work_item_id && (
+                        <span className="text-[10px] font-mono text-slate-400">
+                          {claim.work_item_id}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-slate-200 line-clamp-2">
+                      {claim.claim_text}
+                    </p>
+                    {claim.supporting_source_ids && claim.supporting_source_ids.length > 0 && (
+                      <span className="inline-block text-[10px] text-teal-400 font-medium">
+                        🔍 Citation: [{claim.supporting_source_ids[0]}]
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="p-4 bg-slate-950/60 rounded-xl border border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+            <span>No summary generated yet. Click "Sync Slack &amp; Generate Summary" to pull updates and produce a report.</span>
+            <button
+              onClick={handleSyncSlackAndSummarize}
+              className="text-teal-400 font-bold hover:underline"
+            >
+              Run Now →
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Main Manager Columns: Team Roster & Task Tracking */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

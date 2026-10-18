@@ -17,6 +17,7 @@ from ..services.grouping import group_updates_by_work_item
 from ..services.state_resolution import resolve_work_item_states
 from ..services.conflict_detection import detect_conflicts
 from ..services.blocker_detection import detect_blockers
+from ..services.digest_generator import generate_daily_digest
 
 router = APIRouter(prefix="/api/slack", tags=["Slack Integration"])
 
@@ -372,12 +373,21 @@ def _ingest_slack_records(db: Session, records: List[dict], channel_name: str):
         detect_blockers(db)
         resolve_work_item_states(db)
 
+        # Stage 7: Generate Full Manager Summary Digest automatically
+        generated_digest = generate_daily_digest(
+            db, 
+            digest_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"), 
+            user_role="lead"
+        )
+
     return {
         "status": "success",
         "synced_count": val_res.accepted_count,
         "import_id": import_id,
         "channel": channel_name,
-        "message": f"Successfully ingested {val_res.accepted_count} Slack message(s) through DailySignal pipeline!"
+        "digest_id": generated_digest.id if val_res.accepted_count > 0 else None,
+        "summary_headline": generated_digest.summary_headline if val_res.accepted_count > 0 else None,
+        "message": f"Successfully ingested {val_res.accepted_count} Slack message(s) through validation & deduplication pipeline, and generated Manager Digest!"
     }
 
 
