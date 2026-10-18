@@ -43,25 +43,11 @@ app.include_router(slack.router)
 app.include_router(email_integration.router)
 
 
-@app.get("/")
-def root():
+@app.get("/api")
+def api_info():
     return {
         "service": "DailySignal AI",
         "status": "operational",
-        "stages": [
-            "1. Ingestion",
-            "2. Validation & Normalization",
-            "3. Deduplication",
-            "4. Work Item Grouping",
-            "5. State Resolution",
-            "6. Conflict & Blocker Detection",
-            "7. Cited Digest Generation"
-        ],
-        "dashboards": [
-            "1. Employee Dashboard (Isolated work items, Import updates, Invitations)",
-            "2. Manager Dashboard (10-20 member roster, Task assignment, Feedback, Audit trail)",
-            "3. Director / CEO Dashboard (Company-wide projects, Global employee search, Audit changes)"
-        ],
         "docs_url": "/docs"
     }
 
@@ -69,3 +55,24 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
+
+# Mount frontend React build (serves the complete UI directly from Render)
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+frontend_dist = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "dist")
+
+if os.path.exists(frontend_dist):
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    def serve_react_app(full_path: str):
+        # Don't intercept API or docs routes
+        if full_path.startswith("api") or full_path.startswith("docs") or full_path.startswith("openapi.json"):
+            return None
+        file_path = os.path.join(frontend_dist, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(frontend_dist, "index.html"))
+
