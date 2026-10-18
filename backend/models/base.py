@@ -2,9 +2,17 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy import create_engine
 import os
 
-# Database connection configuration (MySQL via XAMPP with fallback to SQLite)
-DEFAULT_MYSQL_URL = "mysql+pymysql://root:@localhost:3306/dailysignal"
-DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_MYSQL_URL)
+# Database connection configuration:
+# 1. Cloud: Render sets DATABASE_URL (often postgres:// which SQLAlchemy needs as postgresql://)
+# 2. Local MySQL: XAMPP MySQL
+# 3. Fallback: SQLite
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    DATABASE_URL = "mysql+pymysql://root:@localhost:3306/dailysignal"
+
+# Fix Render PostgreSQL prefix if needed
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 connect_args = {}
 if "sqlite" in DATABASE_URL:
